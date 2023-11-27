@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Http;
 
 class AuthController extends BaseController
 {
+    private $base_url = 'apim.mizora.jewelry';
+
     public function login(Request $request): JsonResponse
     {
         $this->validate(
@@ -23,8 +25,8 @@ class AuthController extends BaseController
             ]
         );
         try {
-            $response = Http::post('apiapp.mizora.jewelry/auth', [
-                'phone_number' => $request->phone_number,
+            $response = Http::post($this->base_url . '/api/auth/send_otp', [
+                'number' => $request->phone_number,
             ]);
 
             $data = $response->json();
@@ -40,7 +42,7 @@ class AuthController extends BaseController
                 return response()->json(['message' => 'Server Api Error!'], $response->status());
             }
         } catch (Exception $e) {
-            return response()->json(['message' => 'Terjadi kesalahan dalam pemanggilan API.'], 500);
+            return response()->json(['message' => 'Terjadi kesalahan dalam pemanggilan API.' . $e->getMessage()], 500);
         }
     }
 
@@ -54,7 +56,7 @@ class AuthController extends BaseController
             ]
         );
         try {
-            $response = Http::post('apiapp.mizora.jewelry/verify_otp', [
+            $response = Http::post($this->base_url . '/api/auth/verify_otp', [
                 'otp'           => $request->otp,
                 'phone_number'  => $request->phone_number,
             ]);
@@ -87,7 +89,7 @@ class AuthController extends BaseController
         try {
             $response = Http::withHeaders([
                 'Authorization' => $frontendToken,
-            ])->get('apiapp.mizora.jewelry/user_profile');
+            ])->get($this->base_url . '/api/profile/get_profile');
 
             // $statusCode = $response->status();
             $data = $response->json();
@@ -125,7 +127,7 @@ class AuthController extends BaseController
         try {
             $response = Http::withHeaders([
                 'Authorization' => $frontendToken,
-            ])->put('apiapp.mizora.jewelry/user_profile', [
+            ])->put($this->base_url . '/api/profile/user_profile', [
                 'cus_gender'    => $request->cus_gender,
                 'province_id'   => $request->province_id,
                 'kota_id'       => $request->kota_id,
@@ -161,7 +163,7 @@ class AuthController extends BaseController
             }
             $response = Http::withHeaders([
                 'Authorization' => $frontendToken,
-            ])->post('apiapp.mizora.jewelry/logout');
+            ])->post($this->base_url . '/api/auth/logout');
 
             $data = $response->json();
 
