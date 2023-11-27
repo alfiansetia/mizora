@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Http;
 
 class ProvinceController extends Controller
 {
+    private $base_url = 'apim.mizora.jewelry';
+
     public function index(Request $request)
     {
         $frontendToken = $request->header('Authorization');
@@ -17,19 +19,17 @@ class ProvinceController extends Controller
             return response()->json(['message' => 'Token from frontend is missing.'], 401);
         }
         try {
-            $response = Http::withHeaders([
+            $response = Http::asForm()->withHeaders([
                 'Authorization' => $frontendToken,
-            ])->get('apiapp.mizora.jewelry/provinces');
-
-            // $statusCode = $response->status();
+            ])->get($this->base_url . '/api/address/provinces');
             $data = $response->json();
             if ($response->successful()) {
-                if (isset($data['return'])) {
+                if (isset($data['return']) || isset($data['status'])) {
                     return response()->json($data, $data['return'] ? 200 : 401);
                 }
                 return response()->json($data, $response->status());
             } else {
-                if (isset($data['return'])) {
+                if (isset($data['return']) || isset($data['status'])) {
                     return response()->json($data, $response->status());
                 }
                 return response()->json(['message' => 'Server Api Error!'], $response->status());
