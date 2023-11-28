@@ -26,7 +26,7 @@ class AuthController extends BaseController
             ]);
             return $this->handle_response($response);
         } catch (Exception $e) {
-            return response()->json(['message' => 'Terjadi kesalahan dalam pemanggilan API!'], 500);
+            return response()->json(['message' => 'Terjadi kesalahan dalam pemanggilan API! ' . $e->getMessage()], 500);
         }
     }
 
@@ -41,12 +41,12 @@ class AuthController extends BaseController
         );
         try {
             $response = Http::post($this->base_url . '/api/auth/verify_otp', [
-                'kode_otp'  => $request->otp,
                 'number'    => $request->phone_number,
+                'kode_otp'  => $request->otp,
             ]);
             return $this->handle_response($response);
         } catch (Exception $e) {
-            return response()->json(['message' => 'Terjadi kesalahan dalam pemanggilan API!'], 500);
+            return response()->json(['message' => 'Terjadi kesalahan dalam pemanggilan API! ' . $e->getMessage()], 500);
         }
     }
 
@@ -62,7 +62,7 @@ class AuthController extends BaseController
             ])->get($this->base_url . '/api/profile/get_profile');
             return $this->handle_response($response);
         } catch (Exception $e) {
-            return response()->json(['message' => 'Terjadi kesalahan dalam pemanggilan API!'], 500);
+            return response()->json(['message' => 'Terjadi kesalahan dalam pemanggilan API! ' . $e->getMessage()], 500);
         }
     }
 
@@ -97,7 +97,7 @@ class AuthController extends BaseController
             ]);
             return $this->handle_response($response);
         } catch (Exception $e) {
-            return response()->json(['message' => 'Terjadi kesalahan dalam pemanggilan API!'], 500);
+            return response()->json(['message' => 'Terjadi kesalahan dalam pemanggilan API! ' . $e->getMessage()], 500);
         }
     }
 
@@ -114,7 +114,7 @@ class AuthController extends BaseController
             ])->post($this->base_url . '/api/auth/logout');
             return $this->handle_response($response);
         } catch (Exception $e) {
-            return response()->json(['message' => 'Terjadi kesalahan dalam pemanggilan API!'], 500);
+            return response()->json(['message' => 'Terjadi kesalahan dalam pemanggilan API! ' . $e->getMessage()], 500);
         }
     }
 }
