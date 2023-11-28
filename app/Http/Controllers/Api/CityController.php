@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Traits\CustomApiTrait;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
 class CityController extends Controller
 {
+    use CustomApiTrait;
+
     public function index(Request $request)
     {
         $frontendToken = $request->header('Authorization');
@@ -23,23 +26,10 @@ class CityController extends Controller
             }
             $response = Http::withHeaders([
                 'Authorization' => $frontendToken,
-            ])->get('apiapp.mizora.jewelry/cities', $query);
-
-            // $statusCode = $response->status();
-            $data = $response->json();
-            if ($response->successful()) {
-                if (isset($data['return'])) {
-                    return response()->json($data, $data['return'] ? 200 : 401);
-                }
-                return response()->json($data, $response->status());
-            } else {
-                if (isset($data['return'])) {
-                    return response()->json($data, $response->status());
-                }
-                return response()->json(['message' => 'Server Api Error!'], $response->status());
-            }
+            ])->get($this->base_url . '/api/address/cities', $query);
+            return $this->handle_response($response);
         } catch (Exception $e) {
-            return response()->json(['message' => 'Terjadi kesalahan dalam pemanggilan API.'], 500);
+            return response()->json(['message' => 'Terjadi kesalahan dalam pemanggilan API!'], 500);
         }
     }
 }
