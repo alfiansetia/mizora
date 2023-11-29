@@ -75,25 +75,29 @@ class AuthController extends BaseController
         }
 
         $this->validate($request, [
-            'cus_name'      => 'required',
-            // 'cus_gender'    => 'required',
+            // 'customer_name' => 'required',
+            // 'cus_email'     => 'required|email',
+            // 'tgl_lahir'     => 'required|date_format:Y-m-d',
+            'cus_gender'    => 'required|in:1,2',
             'province_id'   => 'required|integer',
             'kota_id'       => 'required|integer',
             'cus_address'   => 'required',
             'postal_code'   => 'required',
-            'contact_1'     => 'required',
+            // 'cus_contact_2' => 'required',
         ]);
         try {
             $response = Http::withHeaders([
                 'Authorization' => $frontendToken,
             ])->put($this->base_url . '/api/profile/user_profile', [
-                'cus_name'      => $request->cus_name,
-                // 'cus_gender'    => $request->cus_gender,
+                // 'customer_name' => $request->customer_name,
+                // 'cus_email'     => $request->cus_email,
+                // 'tgl_lahir'     => $request->tgl_lahir,
+                'cus_gender'    => $request->cus_gender,
                 'province_id'   => $request->province_id,
                 'kota_id'       => $request->kota_id,
                 'cus_address'   => $request->cus_address,
                 'postal_code'   => $request->postal_code,
-                'cus_contact_1' => $request->contact_1,
+                // 'cus_contact_2' => $request->cus_contact_2,
             ]);
             return $this->handle_response($response);
         } catch (Exception $e) {
