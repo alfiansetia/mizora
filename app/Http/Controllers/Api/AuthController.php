@@ -78,7 +78,7 @@ class AuthController extends BaseController
             // 'customer_name' => 'required',
             // 'cus_email'     => 'required|email',
             // 'tgl_lahir'     => 'required|date_format:Y-m-d',
-            'cus_gender'    => 'required|in:1,2',
+            'cus_gender'    => 'required',
             'province_id'   => 'required',
             'kota_id'       => 'required',
             'cus_address'   => 'required',
