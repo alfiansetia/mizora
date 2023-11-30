@@ -15,8 +15,17 @@ class Slider extends Model
 
     public function getImageAttribute($value)
     {
-        if (!empty($value) && file_exists(public_path('slider/' . $value))) {
-            return url('/images/slider/' . $value);
+        // $path = '/var/www/mizoraadm/public/sliders/';
+        // $from = $path . $value;
+        // $dest = public_path('sliders/' . $value);
+        // if (!empty($value) && file_exists($path . $value) && !file_exists($dest)) {
+        //     if (!file_exists(public_path('sliders/'))) {
+        //         mkdir(public_path('sliders/'), 0775, true);
+        //     }
+        //     copy($from, $dest);
+        // }
+        if (!empty($value) && file_exists(public_path('sliders/' . $value))) {
+            return url('/images/sliders/' . $value);
         } else {
             return url('/images/default.jpg');
         }
