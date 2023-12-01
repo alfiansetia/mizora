@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\RolesController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\ProvinceController;
+use App\Http\Controllers\Api\RadeemController;
 use App\Http\Controllers\Api\RewardController;
 use App\Http\Controllers\Api\SettingController;
 use App\Http\Controllers\Api\SliderController;
@@ -44,6 +45,9 @@ Route::get('setting', [SettingController::class, 'index']);
 Route::get('slider', [SliderController::class, 'index']);
 Route::get('message', [MessageController::class, 'index']);
 
+Route::get('radeems/items', [RadeemController::class, 'items']);
+Route::get('radeems/detail', [RadeemController::class, 'detail']);
+Route::get('radeems', [RadeemController::class, 'index']);
 
 Route::group(['middleware' => 'auth:api'], function () {
 

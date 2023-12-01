@@ -24,9 +24,8 @@ class CityController extends Controller
             if ($request->filled('province_id')) {
                 $query['province_id'] = $request->province_id;
             }
-            $response = Http::withHeaders([
-                'Authorization' => $frontendToken,
-            ])->get($this->base_url . '/api/address/cities', $query);
+            $headers = $this->set_headers(['Authorization' => $frontendToken]);
+            $response = Http::withHeaders($headers)->get($this->base_url . '/api/address/cities', $query);
             return $this->handle_response($response);
         } catch (Exception $e) {
             return response()->json(['message' => 'Terjadi kesalahan dalam pemanggilan API!'], 500);

@@ -20,9 +20,8 @@ class ProvinceController extends Controller
             return response()->json(['message' => 'Token from frontend is missing.'], 401);
         }
         try {
-            $response = Http::withHeaders([
-                'Authorization' => $frontendToken,
-            ])->get($this->base_url . '/api/address/provinces');
+            $headers = $this->set_headers(['Authorization' => $frontendToken]);
+            $response = Http::withHeaders($headers)->get($this->base_url . '/api/address/provinces');
             return $this->handle_response($response);
         } catch (Exception $e) {
             return response()->json(['message' => 'Terjadi kesalahan dalam pemanggilan API!'], 500);

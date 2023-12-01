@@ -21,12 +21,12 @@ class AuthController extends BaseController
             ]
         );
         try {
-            $response = Http::post($this->base_url . '/api/auth/send_otp', [
+            $response = Http::withHeaders($this->headers)->post($this->base_url . '/api/auth/send_otp', [
                 'number' => $request->phone_number,
             ]);
             return $this->handle_response($response);
         } catch (Exception $e) {
-            return response()->json(['message' => 'Terjadi kesalahan dalam pemanggilan API! ' . $e->getMessage()], 500);
+            return $this->handle_error($e->getMessage());
         }
     }
 
@@ -40,13 +40,13 @@ class AuthController extends BaseController
             ]
         );
         try {
-            $response = Http::post($this->base_url . '/api/auth/verify_otp', [
+            $response = Http::withHeaders($this->headers)->post($this->base_url . '/api/auth/verify_otp', [
                 'number'    => $request->phone_number,
                 'kode_otp'  => $request->otp,
             ]);
             return $this->handle_response($response);
         } catch (Exception $e) {
-            return response()->json(['message' => 'Terjadi kesalahan dalam pemanggilan API! ' . $e->getMessage()], 500);
+            return $this->handle_error($e->getMessage());
         }
     }
 
@@ -56,13 +56,12 @@ class AuthController extends BaseController
         if (!$frontendToken) {
             return response()->json(['message' => 'Token from frontend is missing.'], 401);
         }
+        $headers = $this->set_headers(['Authorization' => $frontendToken]);
         try {
-            $response = Http::withHeaders([
-                'Authorization' => $frontendToken,
-            ])->get($this->base_url . '/api/profile/get_profile');
+            $response = Http::withHeaders($headers)->get($this->base_url . '/api/profile/get_profile');
             return $this->handle_response($response);
         } catch (Exception $e) {
-            return response()->json(['message' => 'Terjadi kesalahan dalam pemanggilan API! ' . $e->getMessage()], 500);
+            return $this->handle_error($e->getMessage());
         }
     }
 
@@ -86,9 +85,8 @@ class AuthController extends BaseController
             // 'cus_contact_2' => 'required',
         ]);
         try {
-            $response = Http::withHeaders([
-                'Authorization' => $frontendToken,
-            ])->put($this->base_url . '/api/profile/user_profile', [
+            $headers = $this->set_headers(['Authorization' => $frontendToken]);
+            $response = Http::withHeaders($headers)->put($this->base_url . '/api/profile/user_profile', [
                 // 'customer_name' => $request->customer_name,
                 // 'cus_email'     => $request->cus_email,
                 // 'tgl_lahir'     => $request->tgl_lahir,
@@ -101,7 +99,7 @@ class AuthController extends BaseController
             ]);
             return $this->handle_response($response);
         } catch (Exception $e) {
-            return response()->json(['message' => 'Terjadi kesalahan dalam pemanggilan API! ' . $e->getMessage()], 500);
+            return $this->handle_error($e->getMessage());
         }
     }
 
@@ -113,12 +111,11 @@ class AuthController extends BaseController
             if (!$frontendToken) {
                 return response()->json(['message' => 'Token from frontend is missing.'], 401);
             }
-            $response = Http::withHeaders([
-                'Authorization' => $frontendToken,
-            ])->post($this->base_url . '/api/auth/logout');
+            $headers = $this->set_headers(['Authorization' => $frontendToken]);
+            $response = Http::withHeaders($headers)->post($this->base_url . '/api/auth/logout');
             return $this->handle_response($response);
         } catch (Exception $e) {
-            return response()->json(['message' => 'Terjadi kesalahan dalam pemanggilan API! ' . $e->getMessage()], 500);
+            return $this->handle_error($e->getMessage());
         }
     }
 }
