@@ -8,20 +8,19 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
-class RadeemController extends Controller
+class CategoryRadeemController extends Controller
 {
     use CustomApiTrait;
 
     public function index(Request $request)
     {
         $frontendToken = $request->header('Authorization');
-
         if (!$frontendToken) {
             return $this->handle_unauth();
         }
         $headers = $this->set_headers(['Authorization' => $frontendToken]);
         try {
-            $response = Http::withHeaders($headers)->get($this->base_url . '/api/radeem/all');
+            $response = Http::withHeaders($headers)->get($this->base_url . '/api/radeem/category');
             return $this->handle_response($response);
         } catch (Exception $e) {
             return $this->handle_error($e->getMessage());
@@ -39,29 +38,7 @@ class RadeemController extends Controller
         }
         $headers = $this->set_headers(['Authorization' => $frontendToken]);
         try {
-            $response = Http::asForm()->withHeaders($headers)->get($this->base_url . '/api/radeem/item_detail?radeem_id=' . $id);
-            return $this->handle_response($response);
-        } catch (Exception $e) {
-            return $this->handle_error($e->getMessage());
-        }
-    }
-
-    public function now(Request $request)
-    {
-        $frontendToken = $request->header('Authorization');
-        if (!$frontendToken) {
-            return $this->handle_unauth();
-        }
-        $this->validate($request, [
-            'radeem_id' => 'required',
-        ]);
-        $param = [
-            'radeem_id' => $request->radeem_id,
-        ];
-        $id = $request->radeem_id;
-        $headers = $this->set_headers(['Authorization' => $frontendToken]);
-        try {
-            $response = Http::withHeaders($headers)->post($this->base_url . '/api/radeem/radeem_now', $param);
+            $response = Http::asForm()->withHeaders($headers)->get($this->base_url . '/api/radeem/category_id?id=' . $id);
             return $this->handle_response($response);
         } catch (Exception $e) {
             return $this->handle_error($e->getMessage());
@@ -75,42 +52,65 @@ class RadeemController extends Controller
             return $this->handle_unauth();
         }
         $this->validate($request, [
-            'id_category_radeem'    => 'required',
-            'title'                 => 'required',
-            'goals'                 => 'required',
-            'expired_at'            => 'required|date_format:Y-m-d H:i:s',
-            'image'                 => 'required',
+            'title'     => 'required',
+            'status'    => 'required',
+            'icon'      => 'required',
         ]);
         $param = [
-            'radeem_id' => $request->radeem_id,
+            'title'     => $request->title,
+            'status'    => $request->status,
+            'icon'      => $request->icon,
         ];
         $headers = $this->set_headers(['Authorization' => $frontendToken]);
         try {
-            $response = Http::withHeaders($headers)->post($this->base_url . '/api/radeem/radeem_now', $param);
+            $response = Http::asForm()->withHeaders($headers)->post($this->base_url . '/api/radeem/category_insert', $param);
             return $this->handle_response($response);
         } catch (Exception $e) {
             return $this->handle_error($e->getMessage());
         }
     }
 
-    public function items(Request $request)
+    public function update(Request $request,  string $id)
     {
         $frontendToken = $request->header('Authorization');
-
         if (!$frontendToken) {
             return $this->handle_unauth();
         }
-        $header = $this->headers;
-        $header['Authorization'] = $frontendToken;
-        $query = [];
-        if ($request->filled('type')) {
-            $query['type'] = $request->type;
+        if (!$id) {
+            return $this->handle_not_found();
         }
-        if ($request->filled('category_id')) {
-            $query['id'] = $request->category_id;
-        }
+        $this->validate($request, [
+            'title'     => 'required',
+            'status'    => 'required',
+            'icon'      => 'required',
+        ]);
+        $param = [
+            'id'        => $id,
+            'title'     => $request->title,
+            'status'    => $request->status,
+            'icon'      => $request->icon,
+        ];
+        $headers = $this->set_headers(['Authorization' => $frontendToken]);
         try {
-            $response = Http::asForm()->withHeaders($header)->get($this->base_url . '/api/radeem/items', $query);
+            $response = Http::asForm()->withHeaders($headers)->put($this->base_url . '/api/radeem/category_upd', $param);
+            return $this->handle_response($response);
+        } catch (Exception $e) {
+            return $this->handle_error($e->getMessage());
+        }
+    }
+
+    public function destroy(Request $request,  string $id)
+    {
+        $frontendToken = $request->header('Authorization');
+        if (!$frontendToken) {
+            return $this->handle_unauth();
+        }
+        if (!$id) {
+            return $this->handle_not_found();
+        }
+        $headers = $this->set_headers(['Authorization' => $frontendToken]);
+        try {
+            $response = Http::asForm()->withHeaders($headers)->put($this->base_url . '/api/radeem/category_upd?id=' . $id);
             return $this->handle_response($response);
         } catch (Exception $e) {
             return $this->handle_error($e->getMessage());

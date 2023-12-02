@@ -54,7 +54,7 @@ class AuthController extends BaseController
     {
         $frontendToken = $request->header('Authorization');
         if (!$frontendToken) {
-            return response()->json(['message' => 'Token from frontend is missing.'], 401);
+            return $this->handle_unauth();
         }
         $headers = $this->set_headers(['Authorization' => $frontendToken]);
         try {
@@ -70,7 +70,7 @@ class AuthController extends BaseController
         $frontendToken = $request->header('Authorization');
 
         if (!$frontendToken) {
-            return response()->json(['message' => 'Token from frontend is missing.'], 401);
+            return $this->handle_unauth();
         }
 
         $this->validate($request, [
@@ -109,7 +109,7 @@ class AuthController extends BaseController
             $frontendToken = $request->header('Authorization');
 
             if (!$frontendToken) {
-                return response()->json(['message' => 'Token from frontend is missing.'], 401);
+                return $this->handle_unauth();
             }
             $headers = $this->set_headers(['Authorization' => $frontendToken]);
             $response = Http::withHeaders($headers)->post($this->base_url . '/api/auth/logout');

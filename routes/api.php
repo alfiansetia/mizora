@@ -3,7 +3,11 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CategoryRadeemController;
 use App\Http\Controllers\Api\CityController;
+use App\Http\Controllers\Api\HistoryPointController;
+use App\Http\Controllers\Api\HistoryPurchaseController;
+use App\Http\Controllers\Api\HistoryRadeemController;
 use App\Http\Controllers\Api\LocationController;
 use App\Http\Controllers\Api\MembershipController;
 use App\Http\Controllers\Api\MessageController;
@@ -39,15 +43,34 @@ Route::get('cities', [CityController::class, 'index']);
 
 Route::get('location', [LocationController::class, 'index']);
 Route::get('reward', [RewardController::class, 'index']);
-Route::get('membership', [MembershipController::class, 'index']);
+// Route::get('membership', [MembershipController::class, 'index']);
 
 Route::get('setting', [SettingController::class, 'index']);
 Route::get('slider', [SliderController::class, 'index']);
 Route::get('message', [MessageController::class, 'index']);
 
 Route::get('radeems/items', [RadeemController::class, 'items']);
-Route::get('radeems/detail', [RadeemController::class, 'detail']);
+Route::get('radeems/detail/{id}', [RadeemController::class, 'show']);
 Route::get('radeems', [RadeemController::class, 'index']);
+
+Route::post('radeems-now', [RadeemController::class, 'now']);
+Route::post('radeems-insert', [RadeemController::class, 'store']);
+
+Route::get('radeems-category/{id}', [CategoryRadeemController::class, 'show']);
+Route::delete('radeems-category/{id}', [CategoryRadeemController::class, 'destroy']);
+Route::put('radeems-category/{id}', [CategoryRadeemController::class, 'update']);
+Route::post('radeems-category', [CategoryRadeemController::class, 'store']);
+Route::get('radeems-category', [CategoryRadeemController::class, 'index']);
+
+Route::get('radeems-history/{id}', [HistoryRadeemController::class, 'show']);
+Route::get('radeems-history', [HistoryRadeemController::class, 'index']);
+
+Route::get('purchase-history/{id}', [HistoryPurchaseController::class, 'show']);
+Route::get('purchase-history', [HistoryPurchaseController::class, 'index']);
+
+Route::get('point-history', [HistoryPointController::class, 'index']);
+Route::get('membership', [MembershipController::class, 'index']);
+
 
 Route::group(['middleware' => 'auth:api'], function () {
 
