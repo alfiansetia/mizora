@@ -25,7 +25,7 @@ class Slider extends Model
         //     copy($from, $dest);
         // }
         if (!empty($value) && file_exists(public_path('sliders/' . $value))) {
-            return url('/images/sliders/' . $value);
+            return url('sliders/' . $value);
         } else {
             return url('/images/default.jpg');
         }

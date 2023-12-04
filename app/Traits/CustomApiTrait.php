@@ -22,7 +22,10 @@ trait CustomApiTrait
     {
         $data = $response->json();
         if ($response->successful()) {
-            $statusCode = 200;
+            $statusCode = $response->status();
+            if ($response->status() === 201) {
+                $statusCode = 200;
+            }
             if (empty($data)) {
                 return $this->handle_not_found();
             }
@@ -33,7 +36,7 @@ trait CustomApiTrait
             // } elseif (isset($data['success']) && $data['success']) {
             //     $statusCode = 200;
             // }
-            return response()->json($data, $response->status());
+            return response()->json($data, $statusCode);
         } else {
             if (isset($data['return']) || isset($data['status']) || isset($data['success']) || isset($data['message'])) {
                 return response()->json($data, $response->status());
