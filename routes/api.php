@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\HistoryRadeemController;
 use App\Http\Controllers\Api\LocationController;
 use App\Http\Controllers\Api\MembershipController;
 use App\Http\Controllers\Api\MessageController;
+use App\Http\Controllers\Api\PageController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\RolesController;
 use App\Http\Controllers\Api\PermissionController;
@@ -41,8 +42,9 @@ Route::post('logout', [AuthController::class, 'logout']);
 Route::get('provinces', [ProvinceController::class, 'index']);
 Route::get('cities', [CityController::class, 'index']);
 
-Route::get('location', [LocationController::class, 'index']);
-Route::get('reward', [RewardController::class, 'index']);
+Route::get('locations', [LocationController::class, 'index']);
+Route::get('rewards', [RewardController::class, 'index']);
+Route::get('pages', [PageController::class, 'index']);
 // Route::get('membership', [MembershipController::class, 'index']);
 
 Route::get('setting', [SettingController::class, 'index']);

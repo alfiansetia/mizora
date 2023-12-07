@@ -28,8 +28,8 @@ class Location extends Model
 
     public function getImgAttribute($value)
     {
-        if (!empty($value) && file_exists(public_path('location/' . $value))) {
-            return url('/location/' . $value);
+        if (!empty($value) && file_exists(public_path('locations/' . $value))) {
+            return url('/locations/' . $value);
         } else {
             return url('/images/default.jpg');
         }
