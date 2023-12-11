@@ -48,67 +48,67 @@ class MembershipController extends Controller
         return response()->json(['message' => '', 'data' => $data]);
     }
 
-    public function current(Request $request)
-    {
-        $frontendToken = $request->header('Authorization');
+    // public function current(Request $request)
+    // {
+    //     $frontendToken = $request->header('Authorization');
 
-        if (!$frontendToken) {
-            return $this->handle_unauth();
-        }
-        try {
-            $response = Http::withHeaders([
-                'Authorization' => $frontendToken,
-            ])->get($this->base_url . '/api/profile/get_profile');
+    //     if (!$frontendToken) {
+    //         return $this->handle_unauth();
+    //     }
+    //     try {
+    //         $response = Http::withHeaders([
+    //             'Authorization' => $frontendToken,
+    //         ])->get($this->base_url . '/api/profile/get_profile');
 
-            // $statusCode = $response->status();
-            $data = $response->json();
-            if ($response->successful()) {
-                if (empty($data)) {
-                    return $this->handle_not_found();
-                }
-                $memberships = Membership::orderBy('transaction_from', 'DESC')->get();
-                $current_membership = null;
-                $next_membership = null;
-                $current_point = 0;
-                $point_to_next_membership = 0;
-                if (isset($data['data']) && isset($data['data']['cus_point_membership'])) {
-                    $current_point = intval($data['data']['cus_point_membership']);
-                }
+    //         // $statusCode = $response->status();
+    //         $data = $response->json();
+    //         if ($response->successful()) {
+    //             if (empty($data)) {
+    //                 return $this->handle_not_found();
+    //             }
+    //             $memberships = Membership::orderBy('transaction_from', 'DESC')->get();
+    //             $current_membership = null;
+    //             $next_membership = null;
+    //             $current_point = 0;
+    //             $point_to_next_membership = 0;
+    //             if (isset($data['data']) && isset($data['data']['cus_point_membership'])) {
+    //                 $current_point = intval($data['data']['cus_point_membership']);
+    //             }
 
-                foreach ($memberships as $membership) {
-                    if ($current_point >= $membership->transaction_from && $current_point <= $membership->transaction_to) {
-                        $current_membership = $membership;
-                        break;
-                    }
-                }
-                foreach ($memberships as $membership) {
-                    if ($current_membership && $membership->transaction_from > $current_membership->transaction_to) {
-                        $next_membership = $membership;
-                        break;
-                    }
-                }
+    //             foreach ($memberships as $membership) {
+    //                 if ($current_point >= $membership->transaction_from && $current_point <= $membership->transaction_to) {
+    //                     $current_membership = $membership;
+    //                     break;
+    //                 }
+    //             }
+    //             foreach ($memberships as $membership) {
+    //                 if ($current_membership && $membership->transaction_from > $current_membership->transaction_to) {
+    //                     $next_membership = $membership;
+    //                     break;
+    //                 }
+    //             }
 
-                if ($next_membership) {
-                    $point_to_next_membership = $next_membership->transaction_from - $current_point;
-                }
+    //             if ($next_membership) {
+    //                 $point_to_next_membership = $next_membership->transaction_from - $current_point;
+    //             }
 
-                return response()->json([
-                    'message' => '',
-                    'data' => [
-                        'current_point_membership'  => $current_point,
-                        'point_to_next_membership'  => $point_to_next_membership,
-                        'current_membership'        => $current_membership,
-                        'next_membership'           => $next_membership,
-                    ]
-                ]);
-            } else {
-                if (isset($data['return']) || isset($data['status']) || isset($data['success']) || isset($data['message'])) {
-                    return response()->json($data, $response->status());
-                }
-                return response()->json(['message' => 'Server Api Error!'], $response->status());
-            }
-        } catch (Exception $e) {
-            return $this->handle_error($e->getMessage());
-        }
-    }
+    //             return response()->json([
+    //                 'message' => '',
+    //                 'data' => [
+    //                     'current_point_membership'  => $current_point,
+    //                     'point_to_next_membership'  => $point_to_next_membership,
+    //                     'current_membership'        => $current_membership,
+    //                     'next_membership'           => $next_membership,
+    //                 ]
+    //             ]);
+    //         } else {
+    //             if (isset($data['return']) || isset($data['status']) || isset($data['success']) || isset($data['message'])) {
+    //                 return response()->json($data, $response->status());
+    //             }
+    //             return response()->json(['message' => 'Server Api Error!'], $response->status());
+    //         }
+    //     } catch (Exception $e) {
+    //         return $this->handle_error($e->getMessage());
+    //     }
+    // }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\Membership;
 use App\Traits\CustomApiTrait;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -59,10 +60,59 @@ class AuthController extends BaseController
         $headers = $this->set_headers(['Authorization' => $frontendToken]);
         try {
             $response = Http::withHeaders($headers)->get($this->base_url . '/api/profile/get_profile');
-            return $this->handle_response($response);
+            $data = $response->json();
+            if ($response->successful()) {
+                if (empty($data)) {
+                    return $this->handle_not_found();
+                }
+                $memberships = Membership::orderBy('transaction_from', 'DESC')->get();
+                $current_membership = null;
+                $next_membership = null;
+                $current_point = 0;
+                $point_to_next_membership = 0;
+                if (isset($data['data']) && isset($data['data']['cus_point_membership'])) {
+                    $current_point = intval($data['data']['cus_point_membership']);
+                }
+
+                foreach ($memberships as $membership) {
+                    if ($current_point >= $membership->transaction_from && $current_point <= $membership->transaction_to) {
+                        $current_membership = $membership;
+                        break;
+                    }
+                }
+                foreach ($memberships as $membership) {
+                    if ($current_membership && $membership->transaction_from > $current_membership->transaction_to) {
+                        $next_membership = $membership;
+                        break;
+                    }
+                }
+
+                if ($next_membership) {
+                    $point_to_next_membership = $next_membership->transaction_from - $current_point;
+                }
+
+                $result['data'] = $data['data'];
+                $result['data']['current_point_membership'] = $current_point;
+                $result['data']['point_to_next_membership'] = $point_to_next_membership;
+                $result['data']['current_membership'] = $current_membership;
+                $result['data']['next_membership'] = $next_membership;
+
+                return response()->json($result);
+            } else {
+                if (isset($data['return']) || isset($data['status']) || isset($data['success']) || isset($data['message'])) {
+                    return response()->json($data, $response->status());
+                }
+                return response()->json(['message' => 'Server Api Error!'], $response->status());
+            }
         } catch (Exception $e) {
             return $this->handle_error($e->getMessage());
         }
+        // try {
+        //     $response = Http::withHeaders($headers)->get($this->base_url . '/api/profile/get_profile');
+        //     return $this->handle_response($response);
+        // } catch (Exception $e) {
+        //     return $this->handle_error($e->getMessage());
+        // }
     }
 
     public function update_profile(Request $request): JsonResponse
