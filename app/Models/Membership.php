@@ -16,6 +16,8 @@ class Membership extends Model
     protected $casts = [
         'expiry'            => 'integer',
         'active_membership' => 'integer',
+        'transaction_from'  => 'integer',
+        'transaction_to'    => 'integer',
     ];
 
     public function getImageAttribute($value)

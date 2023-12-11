@@ -70,8 +70,9 @@ class MembershipController extends Controller
                 $current_membership = null;
                 $next_membership = null;
                 $current_point = 0;
+                $point_to_next_membership = 0;
                 if (isset($data['data']) && isset($data['data']['cus_point_membership'])) {
-                    $current_point = $data['data']['cus_point_membership'];
+                    $current_point = intval($data['data']['cus_point_membership']);
                 }
 
                 foreach ($memberships as $membership) {
@@ -87,10 +88,15 @@ class MembershipController extends Controller
                     }
                 }
 
+                if ($next_membership) {
+                    $point_to_next_membership = $next_membership->transaction_from - $current_point;
+                }
+
                 return response()->json([
                     'message' => '',
                     'data' => [
                         'current_point_membership'  => $current_point,
+                        'point_to_next_membership'  => $point_to_next_membership,
                         'current_membership'        => $current_membership,
                         'next_membership'           => $next_membership,
                     ]
