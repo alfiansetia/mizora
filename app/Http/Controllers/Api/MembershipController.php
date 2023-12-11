@@ -13,59 +13,96 @@ class MembershipController extends Controller
 {
     use CustomApiTrait;
 
+    // public function index(Request $request)
+    // {
+    //     $frontendToken = $request->header('Authorization');
+    //     if (!$frontendToken) {
+    //         return $this->handle_unauth();
+    //     }
+    //     $headers = $this->set_headers(['Authorization' => $frontendToken]);
+    //     $this->validate($request, [
+    //         'membership_id' => 'required|in:1,2,3'
+    //     ]);
+    //     $id = $request->membership_id;
+    //     try {
+    //         $response = Http::withHeaders($headers)->get($this->base_url . '/api/membership/customer?membership_id=3');
+    //         return $this->handle_response($response);
+    //     } catch (Exception $e) {
+    //         return $this->handle_error($e->getMessage());
+    //     }
+    // }
+
     public function index(Request $request)
     {
+        $data = Membership::query();
+        $result = $data->get();
+        return response()->json(['message' => '', 'data' => $result]);
+    }
+
+    public function show(string $id)
+    {
+        $data = Membership::find($id);
+        if (!$data) {
+            return $this->handle_not_found();
+        }
+        return response()->json(['message' => '', 'data' => $data]);
+    }
+
+    public function current(Request $request)
+    {
         $frontendToken = $request->header('Authorization');
+
         if (!$frontendToken) {
             return $this->handle_unauth();
         }
-        $headers = $this->set_headers(['Authorization' => $frontendToken]);
-        $this->validate($request, [
-            'membership_id' => 'required|in:1,2,3'
-        ]);
-        $id = $request->membership_id;
         try {
-            $response = Http::withHeaders($headers)->get($this->base_url . '/api/membership/customer?membership_id=3');
-            return $this->handle_response($response);
+            $response = Http::withHeaders([
+                'Authorization' => $frontendToken,
+            ])->get($this->base_url . '/api/profile/get_profile');
+
+            // $statusCode = $response->status();
+            $data = $response->json();
+            if ($response->successful()) {
+                if (empty($data)) {
+                    return $this->handle_not_found();
+                }
+                $memberships = Membership::orderBy('transaction_from', 'DESC')->get();
+                $current_membership = null;
+                $next_membership = null;
+                $current_point = 0;
+                if (isset($data['data']) && isset($data['data']['cus_point_membership'])) {
+                    $current_point = $data['data']['cus_point_membership'];
+                }
+
+                foreach ($memberships as $membership) {
+                    if ($current_point >= $membership->transaction_from && $current_point <= $membership->transaction_to) {
+                        $current_membership = $membership;
+                        break;
+                    }
+                }
+                foreach ($memberships as $membership) {
+                    if ($current_membership && $membership->transaction_from > $current_membership->transaction_to) {
+                        $next_membership = $membership;
+                        break;
+                    }
+                }
+
+                return response()->json([
+                    'message' => '',
+                    'data' => [
+                        'current_point_membership'  => $current_point,
+                        'current_membership'        => $current_membership,
+                        'next_membership'           => $next_membership,
+                    ]
+                ]);
+            } else {
+                if (isset($data['return']) || isset($data['status']) || isset($data['success']) || isset($data['message'])) {
+                    return response()->json($data, $response->status());
+                }
+                return response()->json(['message' => 'Server Api Error!'], $response->status());
+            }
         } catch (Exception $e) {
             return $this->handle_error($e->getMessage());
         }
     }
-
-    // public function index(Request $request)
-    // {
-    //     $data = Membership::query();
-    //     $result = $data->get();
-    //     return response()->json(['message' => '', 'data' => $result]);
-    // }
-
-    // public function get_me(Request $request)
-    // {
-    //     $frontendToken = $request->header('Authorization');
-
-    //     if (!$frontendToken) {
-    //         return response()->json(['message' => 'Token from frontend is missing.'], 401);
-    //     }
-    //     try {
-    //         $response = Http::withHeaders([
-    //             'Authorization' => $frontendToken,
-    //         ])->get('apiapp.mizora.jewelry/user_profile');
-
-    //         // $statusCode = $response->status();
-    //         $data = $response->json();
-    //         if ($response->successful()) {
-    //             if (isset($data['return'])) {
-    //                 return response()->json($data, $data['return'] ? 200 : 401);
-    //             }
-    //             return response()->json($data, $response->status());
-    //         } else {
-    //             if (isset($data['return'])) {
-    //                 return response()->json($data, $response->status());
-    //             }
-    //             return response()->json(['message' => 'Server Api Error!'], $response->status());
-    //         }
-    //     } catch (Exception $e) {
-    //         return response()->json(['message' => 'Terjadi kesalahan dalam pemanggilan API.'], 500);
-    //     }
-    // }
 }

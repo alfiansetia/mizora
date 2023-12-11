@@ -17,4 +17,13 @@ class Membership extends Model
         'expiry'            => 'integer',
         'active_membership' => 'integer',
     ];
+
+    public function getImageAttribute($value)
+    {
+        if (!empty($value) && file_exists(public_path('memberships/' . $value))) {
+            return url('/memberships/' . $value);
+        } else {
+            return url('/images/default.jpg');
+        }
+    }
 }

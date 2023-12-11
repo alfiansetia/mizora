@@ -71,7 +71,10 @@ Route::get('purchase-history/{id}', [HistoryPurchaseController::class, 'show']);
 Route::get('purchase-history', [HistoryPurchaseController::class, 'index']);
 
 Route::get('point-history', [HistoryPointController::class, 'index']);
+
 Route::get('membership', [MembershipController::class, 'index']);
+Route::get('membership/{id}', [MembershipController::class, 'show']);
+Route::get('membership-current', [MembershipController::class, 'current']);
 
 
 Route::group(['middleware' => 'auth:api'], function () {
