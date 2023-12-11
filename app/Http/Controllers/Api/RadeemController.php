@@ -111,7 +111,22 @@ class RadeemController extends Controller
         }
         try {
             $response = Http::asForm()->withHeaders($header)->get($this->base_url . '/api/radeem/items', $query);
-            return $this->handle_response($response);
+            $data = $response->json();
+            if ($response->successful()) {
+                $statusCode = $response->status();
+                if ($response->status() === 201) {
+                    $statusCode = 200;
+                }
+                if (empty($data['data'])) {
+                    $data['data'] = [];
+                }
+                return response()->json($data, $statusCode);
+            } else {
+                if (isset($data['return']) || isset($data['status']) || isset($data['success']) || isset($data['message'])) {
+                    return response()->json($data, $response->status());
+                }
+                return response()->json(['message' => 'Server Api Error!'], $response->status());
+            }
         } catch (Exception $e) {
             return $this->handle_error($e->getMessage());
         }
