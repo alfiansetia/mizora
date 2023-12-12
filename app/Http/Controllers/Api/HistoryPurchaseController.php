@@ -38,7 +38,7 @@ class HistoryPurchaseController extends Controller
         }
         $headers = $this->set_headers(['Authorization' => $frontendToken]);
         try {
-            $response = Http::withHeaders($headers)->get($this->base_url . '/api/radeem/history_detail?id=' . $id);
+            $response = Http::withHeaders($headers)->get($this->base_url . '/api/radeem/history_detail?trx_id=' . $id);
             return $this->handle_response($response);
         } catch (Exception $e) {
             return $this->handle_error($e->getMessage());
