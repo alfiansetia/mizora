@@ -34,9 +34,8 @@ class MembershipController extends Controller
 
     public function index(Request $request)
     {
-        $data = Membership::query();
-        $result = $data->get();
-        return response()->json(['message' => '', 'data' => $result]);
+        $data = Membership::orderBy('transaction_from', 'ASC')->get();
+        return response()->json(['message' => '', 'data' => $data]);
     }
 
     public function show(string $id)

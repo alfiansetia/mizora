@@ -65,7 +65,7 @@ class AuthController extends BaseController
                 if (empty($data)) {
                     return $this->handle_not_found();
                 }
-                $memberships = Membership::orderBy('transaction_from', 'DESC')->get();
+                $memberships = Membership::orderBy('transaction_from', 'ASC')->get();
                 $current_membership = null;
                 $next_membership = null;
                 $current_point = 0;
