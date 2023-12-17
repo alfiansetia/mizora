@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryRadeemController;
 use App\Http\Controllers\Api\CityController;
+use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\HistoryPointController;
 use App\Http\Controllers\Api\HistoryPurchaseController;
 use App\Http\Controllers\Api\HistoryRadeemController;
@@ -76,6 +77,9 @@ Route::get('membership', [MembershipController::class, 'index']);
 Route::get('membership/{id}', [MembershipController::class, 'show']);
 // Route::get('membership-current', [MembershipController::class, 'current']);
 
+Route::post('send-notif', [CustomerController::class, 'index']);
+Route::post('send-notif-user', [CustomerController::class, 'user']);
+Route::post('save-token', [CustomerController::class, 'saveToken']);
 
 Route::group(['middleware' => 'auth:api'], function () {
 
