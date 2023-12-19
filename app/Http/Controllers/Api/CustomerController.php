@@ -9,7 +9,9 @@ use App\Traits\FirebaseTrait;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Validator;
 use Kutia\Larafirebase\Facades\Larafirebase;
+use Illuminate\Support\Str;
 
 class CustomerController extends Controller
 {
@@ -19,19 +21,28 @@ class CustomerController extends Controller
 
     public function __construct()
     {
+        $this->middleware(['custom.auth'])->only(['index', 'user']);
     }
     public function index(Request $request)
     {
-        $this->validate($request, [
-            'title' => 'required',
-            'body'  => 'required',
+        $validator = Validator::make($request->all(), [
+            'title'     => 'required',
+            'body'      => 'required',
         ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'status'    => false,
+                'message'   => 'Form not Complete!',
+                'errors'    => $validator->errors(),
+                'data'      => null,
+            ], 422);
+        }
         $user_tokens = Customer::whereNotNull('fcm_token')->get()->pluck('fcm_token')->toArray();
         if (count($user_tokens) < 1) {
             return response()->json([
-                'status' => false,
-                'message' => 'There is no fcm token in the database!',
-                'data' => null
+                'status'    => false,
+                'message'   => 'There is no fcm token in the database!',
+                'data'      => null
             ]);
         }
         $response = Larafirebase::withTitle($request->title)
@@ -56,7 +67,7 @@ class CustomerController extends Controller
 
     public function user(Request $request)
     {
-        $this->validate($request, [
+        $validator = Validator::make($request->all(), [
             'title'     => 'required',
             'body'      => 'required',
             'user_id'   => [
@@ -66,12 +77,22 @@ class CustomerController extends Controller
                     if (!$customer) {
                         $fail('User Not found!');
                     }
-                    if ($customer  && !$customer->fcm_token) {
+                    if ($customer && !$customer->fcm_token) {
                         $fail('The selected user does not have a valid fcm_token!');
                     }
                 }
             ]
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status'    => false,
+                'message'   => 'Form not Complete!',
+                'errors'    => $validator->errors(),
+                'data'      => null,
+            ], 422);
+        }
+
         $token_user[] = Customer::find($request->user_id)->fcm_token;
         $response = Larafirebase::withTitle($request->title)
             ->withBody($request->body)
