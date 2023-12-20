@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryRadeemController;
 use App\Http\Controllers\Api\CityController;
 use App\Http\Controllers\Api\CustomerController;
+use App\Http\Controllers\Api\FaqController;
 use App\Http\Controllers\Api\HistoryPointController;
 use App\Http\Controllers\Api\HistoryPurchaseController;
 use App\Http\Controllers\Api\HistoryRadeemController;
@@ -46,6 +47,7 @@ Route::get('cities', [CityController::class, 'index']);
 Route::get('locations', [LocationController::class, 'index']);
 Route::get('rewards', [RewardController::class, 'index']);
 Route::get('pages', [PageController::class, 'index']);
+Route::get('faqs', [FaqController::class, 'index']);
 // Route::get('membership', [MembershipController::class, 'index']);
 
 Route::get('setting', [SettingController::class, 'index']);
