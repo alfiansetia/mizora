@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CategoryMessage;
 use App\Models\Customer;
 use App\Models\Message;
+use App\Models\MessageUser;
 use App\Traits\CustomApiTrait;
 use App\Traits\FirebaseTrait;
 use Exception;
@@ -108,15 +109,14 @@ class CustomerController extends Controller
                 'data'      => null,
             ], 422);
         }
-        $category = CategoryMessage::where('name', $request->category)->first();
-        // $message = Message::create([
-        //     'category_message_id'   => $category->id,
-        //     'title'                 => $request->title,
-        //     'url_cta'               => $request->url_cta,
-        //     'label_cta'             => $request->label_cta,
-        //     'description'           => $request->description,
-        //     'datetime'              => now(),
-        // ]);
+        $message = MessageUser::create([
+            'customer_id'           => $request->user_id,
+            'title'                 => $request->title,
+            'url_cta'               => $request->url_cta,
+            'label_cta'             => $request->label_cta,
+            'description'           => $request->description,
+            'datetime'              => now(),
+        ]);
         $token_user[] = Customer::find($request->user_id)->fcm_token;
         $response = Larafirebase::withTitle($request->title)
             ->withBody($request->body)
