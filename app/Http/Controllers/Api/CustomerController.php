@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\CategoryMessage;
 use App\Models\Customer;
+use App\Models\Message;
 use App\Traits\CustomApiTrait;
 use App\Traits\FirebaseTrait;
 use Exception;
@@ -26,8 +28,11 @@ class CustomerController extends Controller
     public function index(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'title'     => 'required',
-            'body'      => 'required',
+            'category'      => 'required|exists:category_message,name',
+            'title'         => 'required|max:200',
+            'url_cta'       => 'required|max:200',
+            'label_cta'     => 'required|max:200',
+            'description'   => 'required|max:200',
         ]);
         if ($validator->fails()) {
             return response()->json([
@@ -37,20 +42,29 @@ class CustomerController extends Controller
                 'data'      => null,
             ], 422);
         }
+        $category = CategoryMessage::where('name', $request->category)->first();
+        $message = Message::create([
+            'category_message_id'   => $category->id,
+            'title'                 => $request->title,
+            'url_cta'               => $request->url_cta,
+            'label_cta'             => $request->label_cta,
+            'description'           => $request->description,
+            'datetime'              => now(),
+        ]);
         $user_tokens = Customer::whereNotNull('fcm_token')->get()->pluck('fcm_token')->toArray();
         if (count($user_tokens) < 1) {
             return response()->json([
                 'status'    => false,
                 'message'   => 'There is no fcm token in the database!',
                 'data'      => null
-            ]);
+            ], 403);
         }
         $response = Larafirebase::withTitle($request->title)
-            ->withBody($request->body)
+            ->withBody($request->description)
             // ->withImage('https://firebase.google.com/images/social.png')
             // ->withIcon('https://seeklogo.com/images/F/firebase-logo-402F407EE0-seeklogo.com.png')
             ->withSound('default')
-            // ->withClickAction('https://www.google.com')
+            ->withClickAction($request->url_cta)
             ->withPriority('high')
             // ->withAdditionalData([
             //     'color' => '#rrggbb',
@@ -60,7 +74,7 @@ class CustomerController extends Controller
         $json = json_decode($response, true);
         return response()->json([
             'status' => !empty($json),
-            'message' => empty($json) ? 'Error Send Notification!' : '',
+            'message' => empty($json) ? 'Error Send Notification!' : 'Success Send Notification!',
             'data' => $json
         ], !empty($json) ? 200 : 500);
     }
@@ -68,9 +82,12 @@ class CustomerController extends Controller
     public function user(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'title'     => 'required',
-            'body'      => 'required',
-            'user_id'   => [
+            'category'      => 'required|exists:category_message,name',
+            'title'         => 'required|max:200',
+            'url_cta'       => 'required|max:200',
+            'label_cta'     => 'required|max:200',
+            'description'   => 'required|max:200',
+            'user_id'       => [
                 'required',
                 function ($attribute, $value, $fail) {
                     $customer = Customer::find($value);
@@ -83,7 +100,6 @@ class CustomerController extends Controller
                 }
             ]
         ]);
-
         if ($validator->fails()) {
             return response()->json([
                 'status'    => false,
@@ -92,11 +108,20 @@ class CustomerController extends Controller
                 'data'      => null,
             ], 422);
         }
-
+        $category = CategoryMessage::where('name', $request->category)->first();
+        // $message = Message::create([
+        //     'category_message_id'   => $category->id,
+        //     'title'                 => $request->title,
+        //     'url_cta'               => $request->url_cta,
+        //     'label_cta'             => $request->label_cta,
+        //     'description'           => $request->description,
+        //     'datetime'              => now(),
+        // ]);
         $token_user[] = Customer::find($request->user_id)->fcm_token;
         $response = Larafirebase::withTitle($request->title)
             ->withBody($request->body)
             ->withSound('default')
+            ->withClickAction($request->url_cta)
             ->withPriority('high')
             ->sendNotification($token_user);
         $json = json_decode($response, true);

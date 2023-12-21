@@ -66,12 +66,13 @@ class AuthController extends BaseController
                     return $this->handle_not_found();
                 }
                 $memberships = Membership::orderBy('transaction_from', 'ASC')->get();
+                $last_membership = Membership::orderBy('transaction_to', 'DESC')->first();
                 $current_membership = null;
                 $next_membership = null;
                 $current_point = 0;
                 $point_to_next_membership = 0;
                 if (isset($data['data']) && isset($data['data']['cus_point_membership'])) {
-                    $current_point = intval($data['data']['cus_point_membership']);
+                    $current_point = intval($data['data']['cus_point_membership'] ?? 0);
                 }
 
                 foreach ($memberships as $membership) {
@@ -86,6 +87,9 @@ class AuthController extends BaseController
                         break;
                     }
                 }
+                if ($last_membership && $current_point > $last_membership->transaction_to) {
+                    $current_membership = $last_membership;
+                }
 
                 if ($next_membership) {
                     $point_to_next_membership = $next_membership->transaction_from - $current_point;
@@ -96,6 +100,7 @@ class AuthController extends BaseController
                 $result['data']['point_to_next_membership'] = $point_to_next_membership;
                 $result['data']['current_membership'] = $current_membership;
                 $result['data']['next_membership'] = $next_membership;
+                $result['data']['last_membership'] = $last_membership;
 
                 return response()->json($result);
             } else {

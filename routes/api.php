@@ -52,7 +52,9 @@ Route::get('faqs', [FaqController::class, 'index']);
 
 Route::get('setting', [SettingController::class, 'index']);
 Route::get('slider', [SliderController::class, 'index']);
+
 Route::get('message', [MessageController::class, 'index']);
+Route::get('message-push/{message}', [MessageController::class, 'push']);
 
 Route::get('radeems/items', [RadeemController::class, 'items']);
 Route::get('radeems/detail/{id}', [RadeemController::class, 'show']);
