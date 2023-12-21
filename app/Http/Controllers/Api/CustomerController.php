@@ -83,7 +83,6 @@ class CustomerController extends Controller
     public function user(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'category'      => 'required|exists:category_message,name',
             'title'         => 'required|max:200',
             'url_cta'       => 'required|max:200',
             'label_cta'     => 'required|max:200',
