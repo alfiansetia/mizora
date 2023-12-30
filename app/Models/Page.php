@@ -12,10 +12,14 @@ class Page extends Model
 
     public function getImageAttribute($value)
     {
-        if (!empty($value) && file_exists(public_path('pages/' . $value))) {
-            return url('/pages/' . $value);
+        $base_url = 'https://assets.mizora.jewelry/appmob/';
+        $path = 'pages/';
+        $public_path = '/var/www/mizoraadm/public/images/';
+        $default_img = 'default.jpg';
+        if (!empty($value) && file_exists($public_path . $path . $value)) {
+            return $base_url . $path . $value;
         } else {
-            return url('/images/default.jpg');
+            return $base_url . $default_img;
         }
     }
 }

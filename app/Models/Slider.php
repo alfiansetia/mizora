@@ -15,19 +15,14 @@ class Slider extends Model
 
     public function getImageAttribute($value)
     {
-        // $path = '/var/www/mizoraadm/public/sliders/';
-        // $from = $path . $value;
-        // $dest = public_path('sliders/' . $value);
-        // if (!empty($value) && file_exists($path . $value) && !file_exists($dest)) {
-        //     if (!file_exists(public_path('sliders/'))) {
-        //         mkdir(public_path('sliders/'), 0775, true);
-        //     }
-        //     copy($from, $dest);
-        // }
-        if (!empty($value) && file_exists(public_path('sliders/' . $value))) {
-            return url('sliders/' . $value);
+        $base_url = 'https://assets.mizora.jewelry/appmob/';
+        $path = 'slider/';
+        $public_path = '/var/www/mizoraadm/public/images/';
+        $default_img = 'default.jpg';
+        if (!empty($value) && file_exists($public_path . $path . $value)) {
+            return $base_url . $path . $value;
         } else {
-            return url('/images/default.jpg');
+            return $base_url . $default_img;
         }
     }
 }

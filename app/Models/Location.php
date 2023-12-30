@@ -28,10 +28,14 @@ class Location extends Model
 
     public function getImgAttribute($value)
     {
-        if (!empty($value) && file_exists(public_path('locations/' . $value))) {
-            return url('/locations/' . $value);
+        $base_url = 'https://assets.mizora.jewelry/appmob/';
+        $path = 'location/';
+        $public_path = '/var/www/mizoraadm/public/images/';
+        $default_img = 'default.jpg';
+        if (!empty($value) && file_exists($public_path . $path . $value)) {
+            return $base_url . $path . $value;
         } else {
-            return url('/images/default.jpg');
+            return $base_url . $default_img;
         }
     }
 }
