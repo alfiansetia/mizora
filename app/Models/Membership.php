@@ -14,7 +14,7 @@ class Membership extends Model
     protected $guarded = ['id'];
 
     protected $casts = [
-        'expiry'            => 'integer',
+        // 'expiry'            => 'date',
         'active_membership' => 'integer',
         'transaction_from'  => 'integer',
         'transaction_to'    => 'integer',
@@ -22,10 +22,14 @@ class Membership extends Model
 
     public function getImageAttribute($value)
     {
-        if (!empty($value) && file_exists(public_path('memberships/' . $value))) {
-            return url('/memberships/' . $value);
+        $base_url = 'https://assets.mizora.jewelry/appmob/';
+        $path = 'levels/';
+        $public_path = '/var/www/mizoraadm/public/images/';
+        $default_img = 'default.jpg';
+        if (!empty($value) && file_exists($public_path . $path . $value)) {
+            return $base_url . $path . $value;
         } else {
-            return url('/images/default.jpg');
+            return $base_url . $default_img;
         }
     }
 }

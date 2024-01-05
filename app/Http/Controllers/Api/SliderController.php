@@ -10,7 +10,7 @@ class SliderController extends Controller
 {
     public function index(Request $request)
     {
-        $data = Slider::all();
+        $data = Slider::latest('id')->get();
         return response()->json(['message' => '', 'data' => $data]);
     }
 }

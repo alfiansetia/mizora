@@ -10,7 +10,7 @@ class LocationController extends BaseController
 {
     public function index()
     {
-        $data = Location::get();
+        $data = Location::where('status', 1)->get();
         return response()->json(['message' => '', 'data' => $data]);
     }
 }
